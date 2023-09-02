@@ -22,7 +22,7 @@ export default function RootLayout({
       {/* Add suppresshydration warning cause of themeprovider(darkmode) */}
       <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
-          <ThemeProvider attribute="class" forcedTheme='dark' enableSystem>
+          <ThemeProvider attribute="class" defaultTheme='dark' enableSystem>
             {children}
           </ThemeProvider>
         </body>
