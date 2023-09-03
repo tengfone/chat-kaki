@@ -3,7 +3,8 @@
 // npx prisma db push => add to planetscale (serverless SQL)
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"] // enable searching for Kakis
 }
 
 datasource db {
@@ -15,4 +16,25 @@ datasource db {
 model Category {
   id   String @id @default(uuid())
   name String
+  Kaki Kaki[] // Relational
+}
+
+model Kaki {
+  id           String @id @default(uuid())
+  userId       String
+  userName     String
+  src          String
+  description  String
+  name         String @db.Text // Enable longer char, makes it searchable 
+  instructions String @db.Text // Minimum 200 char
+  seed         String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  @@index([categoryId]) // Remove category warning (line 34)
+  @@fulltext([name]) // enable search on name
 }

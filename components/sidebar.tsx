@@ -19,7 +19,7 @@ export const Sidebar = () => {
         },
         {
             icon: Plus,
-            href: "/companion/new",
+            href: "/kaki/new",
             label: "Create",
             pro: true,
         },
