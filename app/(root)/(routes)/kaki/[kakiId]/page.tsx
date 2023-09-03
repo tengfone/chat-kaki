@@ -1,5 +1,6 @@
 import prismadb from "@/lib/prismadb";
 import { KakiForm } from "./components/kaki-form";
+import { auth, redirectToSignIn } from "@clerk/nextjs";
 
 interface KakiIdPageProps {
     params: {
@@ -10,11 +11,19 @@ interface KakiIdPageProps {
 const KakiIdPage = async ({
     params
 }: KakiIdPageProps) => {
+
+    const { userId } = auth()
+
+    if (!userId) {
+        return redirectToSignIn()
+    }
+
     // todo: check subscription
 
     const kaki = await prismadb.kaki.findUnique({
         where: {
-            id: params.kakiId
+            id: params.kakiId,
+            userId
         }
     })
 
