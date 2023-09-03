@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
+import axios from "axios"
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface KakiFormProps {
     initialData: Kaki | null;
@@ -50,6 +53,9 @@ Yi Long Ma: Always! But right now, I'm particularly excited about Neuralink. It 
 
 export const KakiForm = ({ categories, initialData }: KakiFormProps) => {
 
+    const router = useRouter()
+    const { toast } = useToast()
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData || {
@@ -65,7 +71,28 @@ export const KakiForm = ({ categories, initialData }: KakiFormProps) => {
     const isLoading = form.formState.isSubmitting
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+        try {
+            if (initialData) {
+                // Update
+                await axios.patch(`/api/kaki/${initialData.id}`, values)
+            } else {
+                // Create Kaki
+                await axios.post(`/api/kaki`, values)
+            }
+
+            toast({
+                description: "Success"
+            })
+
+            router.refresh(); // Refresh all server components
+            router.push("/")
+
+        } catch (err) {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong"
+            })
+        }
     }
 
     return (
