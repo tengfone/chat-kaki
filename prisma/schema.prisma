@@ -35,6 +35,29 @@ model Kaki {
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
 
+  messages Message[]
+
   @@index([categoryId]) // Remove category warning (line 34)
   @@fulltext([name]) // enable search on name
+}
+
+enum Role {
+  user
+  system
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  role      Role // can either be send by the user/system
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kakiId String
+  userId String
+
+  kaki Kaki @relation(fields: [kakiId], references: [id], onDelete: Cascade) // Cascade is use to delete messages from kaki, 
+  // else relational issue as there are outstanding relation with the message model
+
+  @@index([kakiId])
 }
