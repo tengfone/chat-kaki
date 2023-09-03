@@ -1,0 +1,18 @@
+// Prisma is a ORM (object relational mapping -> Convert SQL queries using language in this case TS)
+// npx prisma generate => add to local prisma so we can work with it  
+// npx prisma db push => add to planetscale (serverless SQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String
+}
