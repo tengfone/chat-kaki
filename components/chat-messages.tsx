@@ -49,7 +49,7 @@ export const ChatMessages = ({
                     role={message.role}
                     key={message.content}
                     content={message.content}
-                    src={message.src}
+                    src={kaki.src}
                 />
             ))}
             {isLoading && (
