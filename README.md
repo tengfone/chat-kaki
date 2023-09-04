@@ -40,3 +40,7 @@ https://www.youtube.com/watch?v=PjYWpd7xkaM&t=18105s
 - NextJS 13
 - shadcn-ui
 - clerk.com
+- Langchain
+- Ai (vercel)
+- Pinecone
+- Redis (upstash) & ratelimit
