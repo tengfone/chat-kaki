@@ -7,6 +7,7 @@ import { FormEvent, useState } from "react";
 import { useCompletion } from "ai/react"
 import { ChatForm } from "@/components/chat-form";
 import { ChatMessages } from "@/components/chat-messages";
+import { ChatMessageProps } from "@/components/chat-message";
 
 interface ChatClientProps {
     kaki: Kaki & {
@@ -20,12 +21,12 @@ interface ChatClientProps {
 export const ChatClient = ({ kaki }: ChatClientProps) => {
 
     const router = useRouter();
-    const [messages, setMessages] = useState<any[]>(kaki.messages)
+    const [messages, setMessages] = useState<ChatMessageProps[]>(kaki.messages)
 
     const { input, isLoading, handleInputChange, handleSubmit, setInput } = useCompletion({
         api: `/api/chat/${kaki.id}`,
         onFinish(prompt, completion) {
-            const systemMessage = { // AI Message object
+            const systemMessage: ChatMessageProps = { // AI Message object
                 role: "system",
                 content: completion
             }
@@ -38,7 +39,7 @@ export const ChatClient = ({ kaki }: ChatClientProps) => {
     })
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-        const userMessage = {
+        const userMessage: ChatMessageProps = {
             role: "user",
             content: input
         }
@@ -51,7 +52,7 @@ export const ChatClient = ({ kaki }: ChatClientProps) => {
     return (
         <div className="flex flex-col h-full p-4 space-y-2">
             <ChatHeader kaki={kaki} />
-            <ChatMessages 
+            <ChatMessages
                 kaki={kaki}
                 isLoading={isLoading}
                 messages={messages}
