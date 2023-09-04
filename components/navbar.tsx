@@ -14,6 +14,7 @@ import { Button } from "./ui/button";
 // From CN in lib/utils.ts (init by the library)
 import { cn } from "@/lib/utils";
 import { MobileSidebar } from "./mobile-sidebar";
+import Image from "next/image";
 
 
 const font = Poppins({
@@ -38,7 +39,7 @@ export const Navbar = () => {
                     <Sparkles className="h-4 w-4 fill-white text-white ml-2" />
                 </Button>
                 <ModeToggle />
-                <UserButton afterSignOutUrl="/"/>
+                <UserButton afterSignOutUrl="/" />
             </div>
         </div>
     )
