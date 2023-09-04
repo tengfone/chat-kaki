@@ -98,15 +98,15 @@ export async function POST(
       await model
         .call(
           `
-            ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${kaki.name}: prefix.
-
-            ${kaki.instructions}
-
-            Below are the relevant details about ${kaki.name}'s past and the conversation you were in.
-            ${relevantHistory}
-
-            ${recentChatHistory}\n${kaki.name}
-            `
+          ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${kaki.name}: prefix. 
+  
+          ${kaki.instructions}
+  
+          Below are relevant details about ${kaki.name}'s past and the conversation you are in.
+          ${relevantHistory}
+  
+  
+          ${recentChatHistory}\n${kaki.name}:`
         )
         .catch(console.error)
     );
