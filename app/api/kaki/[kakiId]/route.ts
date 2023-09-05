@@ -1,4 +1,5 @@
 import prismadb from "@/lib/prismadb";
+import { checkSubscription } from "@/lib/subscription";
 import { auth, currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
@@ -30,7 +31,12 @@ export async function PATCH(
       return new NextResponse("Missing Required Fields", { status: 400 });
     }
 
-    //todo: Check pro
+    // Check subscription
+    const isPro = await checkSubscription();
+
+    if (!isPro) {
+      return new NextResponse("Pro Subscription Required", { status: 403 });
+    }
 
     const kaki = await prismadb.kaki.update({
       where: {
