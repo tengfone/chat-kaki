@@ -44,3 +44,7 @@ https://www.youtube.com/watch?v=PjYWpd7xkaM&t=18105s
 - Ai (vercel)
 - Pinecone
 - Redis (upstash) & ratelimit
+
+## Demo
+Unforunately, I have deleted all the APIs and accounts thus unable to load the demo. Here are a few screenshots from a happy user.
+![demo](./demo_chatkaki.gif)
