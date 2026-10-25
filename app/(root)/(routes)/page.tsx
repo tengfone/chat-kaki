@@ -4,13 +4,14 @@ import { SearchInput } from "@/components/search-input"
 import prismadb from "@/lib/prismadb" // import this as a global var to access the db
 
 interface RootPageProps {
-    searchParams: { // convention nextJS
+    searchParams: Promise<{ // convention nextJS (async in Next.js 15)
         categoryId: string;
         name: string;
-    }
+    }>
 }
 
-const RootPage = async ({ searchParams }: RootPageProps) => {
+const RootPage = async (props: RootPageProps) => {
+    const searchParams = await props.searchParams;
 
     const data = await prismadb.kaki.findMany({
         where: {

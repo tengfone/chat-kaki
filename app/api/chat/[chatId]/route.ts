@@ -1,8 +1,7 @@
-import { StreamingTextResponse, LangChainStream } from "ai";
-import { auth, currentUser } from "@clerk/nextjs";
-import { CallbackManager } from "langchain/callbacks";
+import { StreamingTextResponse } from "ai";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { Replicate } from "langchain/llms/replicate";
+import Replicate from "replicate";
 
 import { MemoryManager } from "@/lib/memory";
 import { rateLimit } from "@/lib/rate-limit";
@@ -10,9 +9,10 @@ import prismadb from "@/lib/prismadb";
 
 export async function POST(
   request: Request,
-  { params }: { params: { chatId: string } }
+  props: { params: Promise<{ chatId: string }> }
 ) {
   try {
+    const params = await props.params;
     const { prompt } = await request.json();
     const user = await currentUser();
 
@@ -78,25 +78,27 @@ export async function POST(
       relevantHistory = similarDocs.map((doc) => doc.pageContent).join("\n");
     }
 
-    const { handlers } = LangChainStream();
-
-    //Create model
-    const model = new Replicate({
-      model:
-        // "a16z-infra/llama-2-13b-chat:9dff94b1bed5af738655d4a7cbcdcde2bd503aa85c94334fe1f42af7f3dd5ee3", // Model from replicate
-        "a16z-infra/llama-2-13b-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5", // Model from replicate
-      input: {
-        max_length: 2048,
-      },
-      apiKey: process.env.REPLICATE_API_TOKEN,
-      callbackManager: CallbackManager.fromHandlers(handlers),
+    // Call the Replicate model directly (langchain's Replicate LLM wrapper was removed
+    // from the patched langchain releases; this is what it did under the hood)
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN!,
     });
+    const model =
+      // "a16z-infra/llama-2-13b-chat:9dff94b1bed5af738655d4a7cbcdcde2bd503aa85c94334fe1f42af7f3dd5ee3", // Model from replicate
+      "a16z-infra/llama-2-13b-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5"; // Model from replicate
 
-    model.verbose = true; // add logs
+    const callModel = async (prompt: string) => {
+      const output = await replicate.run(model, {
+        input: {
+          prompt,
+          max_length: 2048,
+        },
+      });
+      return Array.isArray(output) ? output.join("") : String(output);
+    };
 
     const resp = String(
-      await model
-        .call(
+      await callModel(
           `
           ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${kaki.name}: prefix. 
   

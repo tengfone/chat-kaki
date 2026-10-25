@@ -1,16 +1,17 @@
 import prismadb from "@/lib/prismadb";
-import { auth, redirectToSignIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ChatClient } from "./components/client";
 
 interface ChatIdPageProps {
-    params: { // params and not search params because we are not using search params in this page, its not a query
+    params: Promise<{ // params and not search params because we are not using search params in this page, its not a query
         chatId: string;
-    }
+    }>
 }
 
-const ChatIdPage = async ({ params }: ChatIdPageProps) => {
-    const { userId } = auth()
+const ChatIdPage = async (props: ChatIdPageProps) => {
+    const params = await props.params;
+    const { userId, redirectToSignIn } = await auth()
 
     if (!userId) {
         return redirectToSignIn();

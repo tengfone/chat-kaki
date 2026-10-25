@@ -1,18 +1,17 @@
 import prismadb from "@/lib/prismadb";
 import { KakiForm } from "./components/kaki-form";
-import { auth, redirectToSignIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 interface KakiIdPageProps {
-    params: {
+    params: Promise<{
         kakiId: string; // must be reflective of the next route
-    }
+    }>
 }
 
-const KakiIdPage = async ({
-    params
-}: KakiIdPageProps) => {
+const KakiIdPage = async (props: KakiIdPageProps) => {
+    const params = await props.params;
 
-    const { userId } = auth()
+    const { userId, redirectToSignIn } = await auth()
 
     if (!userId) {
         return redirectToSignIn()

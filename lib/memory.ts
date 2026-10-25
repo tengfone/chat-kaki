@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { PineconeClient } from "@pinecone-database/pinecone";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
 
 export type KakiKey = {
   kakiName: string;
@@ -12,30 +12,28 @@ export type KakiKey = {
 export class MemoryManager {
   private static instance: MemoryManager;
   private history: Redis;
-  private vectorDBClient: PineconeClient;
+  private vectorDBClient: Pinecone;
 
   public constructor() {
     this.history = Redis.fromEnv();
-    this.vectorDBClient = new PineconeClient();
+    // Pinecone SDK v5+: the API key is enough, PINECONE_ENVIRONMENT is no longer used
+    this.vectorDBClient = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
   }
 
   public async init() {
-    if (this.vectorDBClient instanceof PineconeClient) {
-      await this.vectorDBClient.init({
-        apiKey: process.env.PINECONE_API_KEY!,
-        environment: process.env.PINECONE_ENVIRONMENT!,
-      });
-    }
+    // Nothing to initialise: the v5+ Pinecone client is ready after construction
   }
 
   public async vectorSearch(recentChatHistory: string, kakiFileName: string) {
-    const pineconeClient = <PineconeClient>this.vectorDBClient;
+    const pineconeClient = this.vectorDBClient;
     const pineconeIndex = pineconeClient.Index(
       process.env.PINECONE_INDEX! || ""
     );
 
     const vectorStore = await PineconeStore.fromExistingIndex(
-      new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY }),
+      new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY }),
       { pineconeIndex }
     );
 
